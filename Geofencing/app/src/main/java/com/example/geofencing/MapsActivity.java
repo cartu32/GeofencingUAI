@@ -39,8 +39,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private float GEOFENCE_RADIUS = 200;
     private String GEOFENCE_ID = "SOME_GEOFENCE_ID";
 
-    private int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
-    private int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
+    private final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
+    private final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,50 +78,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapLongClickListener(this);
     }
 
+    void requestPermissons(String permisson, int requestCode) {
+        //Ask for permission
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, permisson)) {
+            //We need to show user a dialog for displaying why the permission is needed and then ask for the permission...
+            ActivityCompat.requestPermissions(this, new String[]{permisson}, requestCode);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{permisson}, requestCode);
+        }
+    }
+
     private void enableUserLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         } else {
-            //Ask for permission
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                //We need to show user a dialog for displaying why the permission is needed and then ask for the permission...
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
-            }
+            requestPermissons(Manifest.permission.ACCESS_FINE_LOCATION, FINE_LOCATION_ACCESS_REQUEST_CODE);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == FINE_LOCATION_ACCESS_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //We have the permission
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
+
+        switch(requestCode){
+
+            case FINE_LOCATION_ACCESS_REQUEST_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //We have the permission
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    mMap.setMyLocationEnabled(true);
                 }
-                mMap.setMyLocationEnabled(true);
-            } else {
-                //We do not have the permission..
-
             }
-        }
+            break;
 
-        if (requestCode == BACKGROUND_LOCATION_ACCESS_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //We have the permission
-                Toast.makeText(this, "You can add geofences...", Toast.LENGTH_SHORT).show();
-            } else {
-                //We do not have the permission..
-                Toast.makeText(this, "Background location access is neccessary for geofences to trigger...", Toast.LENGTH_SHORT).show();
+            case BACKGROUND_LOCATION_ACCESS_REQUEST_CODE:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //We have the permission
+                    Toast.makeText(this, "You can add geofences...", Toast.LENGTH_SHORT).show();
+                } else {
+                    //We do not have the permission..
+                    Toast.makeText(this, "Background location access is neccessary for geofences to trigger...", Toast.LENGTH_SHORT).show();
+                }
             }
+            break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + requestCode);
         }
     }
 
@@ -132,14 +134,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 handleMapLongClick(latLng);
             } else {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-                    //We show a dialog and ask for permission
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
-                } else {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
-                }
+                requestPermissons(Manifest.permission.ACCESS_BACKGROUND_LOCATION, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
             }
-
         } else {
             handleMapLongClick(latLng);
         }
@@ -160,13 +156,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         PendingIntent pendingIntent = geofenceHelper.getPendingIntent();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         geofencingClient.addGeofences(geofencingRequest, pendingIntent)
