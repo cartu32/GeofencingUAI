@@ -1,9 +1,18 @@
 package com.example.geofencing;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 
 import android.Manifest;
 import android.app.PendingIntent;
@@ -13,6 +22,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -28,7 +40,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
+
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, LocationListener {
 
     private static final String TAG = "MapsActivity";
 
@@ -38,9 +52,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private float GEOFENCE_RADIUS = 200;
     private String GEOFENCE_ID = "SOME_GEOFENCE_ID";
+    private AlertDialog  alert = null;
 
     private final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
     private final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
+    public static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 30;
+    public static final long MIN_TIME_BW_UPDATES = 1000 * 45;
+    // intent request code to handle updating play services if needed.
+    private static final int RC_HANDLE_GMS = 9001;
+
+    /*Se declara una variable de tipo LocationManager encargada de proporcionar acceso al servicio de localización del sistema.*/
+    private LocationManager locationManager;
+    /*Se declara una variable de tipo Location que accederá a la última posición conocida proporcionada por el proveedor.*/
+    private Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,51 +79,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         geofenceHelper = new GeofenceHelper(this);
     }
 
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng eiffel = new LatLng(48.8589, 2.29365);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eiffel, 16));
+        int resultCode= GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            Dialog dlg =GoogleApiAvailability.getInstance().getErrorDialog(this, resultCode, RC_HANDLE_GMS);
+            dlg.show();
+        }
 
-        enableUserLocation();
+
+        if (Build.VERSION.SDK_INT >= 29) {
+            //We need background permission
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
+            } else {
+
+            }
+        }
+        // pedimos permisos para usar la geolocalizacion del dispositivo
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            //A partir de la api 23, se tiene que pedir permisos al dispositivo
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.INTERNET}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+            }
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                    return;
+        }
 
         mMap.setOnMapLongClickListener(this);
+
+        //TODO preseteamos algunas herramientos que el mapa nos puede proveer
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setAllGesturesEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(true);
+
+        getLocation();
     }
 
-    void requestPermissons(String permisson, int requestCode) {
-        //Ask for permission
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, permisson)) {
-            //We need to show user a dialog for displaying why the permission is needed and then ask for the permission...
-            ActivityCompat.requestPermissions(this, new String[]{permisson}, requestCode);
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{permisson}, requestCode);
-        }
-    }
 
-    private void enableUserLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-        } else {
-            requestPermissons(Manifest.permission.ACCESS_FINE_LOCATION, FINE_LOCATION_ACCESS_REQUEST_CODE);
-        }
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        switch(requestCode){
+        switch (requestCode) {
 
             case FINE_LOCATION_ACCESS_REQUEST_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -108,45 +137,129 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         return;
                     }
                     mMap.setMyLocationEnabled(true);
+                    mMap.getUiSettings().setAllGesturesEnabled(true);
+                    mMap.getUiSettings().setMyLocationButtonEnabled(true);
+                    mMap.getUiSettings().setZoomControlsEnabled(true);
+                    mMap.getUiSettings().setMapToolbarEnabled(false);
+                    //Si se aceptaron los permisos entonces debemos mostrar nuestra ubicacion
+                    //volviendo a pedir a los servicios de ubicacion nuestra posicion
+                    getLocation();
                 }
             }
             break;
 
-            case BACKGROUND_LOCATION_ACCESS_REQUEST_CODE:{
+            case BACKGROUND_LOCATION_ACCESS_REQUEST_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //We have the permission
-                    Toast.makeText(this, "You can add geofences...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Ahora puedes agregar puntos de Georeferencia", Toast.LENGTH_SHORT).show();
                 } else {
                     //We do not have the permission..
-                    Toast.makeText(this, "Background location access is neccessary for geofences to trigger...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "El acceso a la ubicación en segundo plano es necesario para que se activen las geocercas...", Toast.LENGTH_SHORT).show();
                 }
             }
             break;
             default:
                 throw new IllegalStateException("Unexpected value: " + requestCode);
         }
+
     }
 
-    @Override
-    public void onMapLongClick(LatLng latLng) {
-        if (Build.VERSION.SDK_INT >= 29) {
-            //We need background permission
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                handleMapLongClick(latLng);
-            } else {
-                requestPermissons(Manifest.permission.ACCESS_BACKGROUND_LOCATION, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
+    void setPositionGPS() {
+        if (location == null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
             }
-        } else {
-            handleMapLongClick(latLng);
+            locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    MIN_TIME_BW_UPDATES,
+                    MIN_DISTANCE_CHANGE_FOR_UPDATES, (LocationListener) this);
+            if (locationManager != null) {
+                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (location != null) {
+                    positionUpdate(location);
+                }
+            }
+        }
+    }
+
+    void setPositionNetwork(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        locationManager.requestLocationUpdates(
+                LocationManager.NETWORK_PROVIDER,
+                MIN_TIME_BW_UPDATES,
+                MIN_DISTANCE_CHANGE_FOR_UPDATES, (LocationListener) this);
+        if (locationManager != null) {
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (location != null) {
+                positionUpdate(location);
+            }
         }
 
     }
+    public Location getLocation() {
+        try {
+            locationManager = (LocationManager) getApplicationContext()
+                    .getSystemService(getApplicationContext().LOCATION_SERVICE);
 
-    private void handleMapLongClick(LatLng latLng) {
-        mMap.clear();
-        addMarker(latLng);
-        addCircle(latLng, GEOFENCE_RADIUS);
-        addGeofence(latLng, GEOFENCE_RADIUS);
+            // getting GPS status
+            boolean isGPSEnabled = locationManager
+                    .isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+            // getting network status
+            boolean isNetworkEnabled = locationManager
+                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+            if (!isGPSEnabled && !isNetworkEnabled) {
+                // Si no hay proveedor habilitado
+                //solicito que active el gps
+                alertNoGps();
+                }
+
+            // if GPS Enabled get lat/long using GPS Services
+            if (isGPSEnabled) {
+                setPositionGPS();
+            }else if (isNetworkEnabled) {
+                setPositionNetwork();
+            }
+
+        } catch (Exception e) {
+            Log.e("getLocation", e.getMessage());
+        }
+        return location;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        positionUpdate(location);
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
+
+    private void positionUpdate(Location location) {
+
+        if (location != null) {
+            //obtengo mi posicion
+            this.location = location;
+            float zoomLevel = 16.0f; //This goes up to 21
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
+        }
     }
 
     private void addGeofence(LatLng latLng, float radius) {
@@ -188,4 +301,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         circleOptions.strokeWidth(4);
         mMap.addCircle(circleOptions);
     }
-}
+        @Override
+        public void onMapLongClick(LatLng latLng) {
+            handleMapLongClick(latLng);
+
+        }
+
+        private void handleMapLongClick(LatLng latLng) {
+            mMap.clear();
+            addMarker(latLng);
+            addCircle(latLng, GEOFENCE_RADIUS);
+            addGeofence(latLng, GEOFENCE_RADIUS);
+        }
+
+        private void alertNoGps() {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("El sistema GPS esta desactivado, ¿Desea activarlo?")
+                    .setCancelable(false)
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            setPositionGPS();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                            dialog.cancel();
+                        }
+                    });
+            alert = builder.create();
+            alert.show();
+        }
+        @Override
+        protected void onDestroy(){
+            super.onDestroy();
+            if(alert != null)
+            {
+                alert.dismiss ();
+            }
+        }
+    }
+
+
+
+    
