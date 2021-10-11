@@ -31,6 +31,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -38,7 +39,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, LocationListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, LocationListener,InterfaceConfigGeofence {
 
     private static final String TAG = "MapsActivity";
 
@@ -46,7 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GeofencingClient geofencingClient;
     private GeofenceHelper geofenceHelper;
 
-    private float GEOFENCE_RADIUS = 200;
+    private float GEOFENCE_RADIUS_DEFAULT = 100;
     private String GEOFENCE_ID = "SOME_GEOFENCE_ID";
     private AlertDialog  alert = null;
 
@@ -56,11 +57,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final long MIN_TIME_BW_UPDATES = 1000 * 45;
     // intent request code to handle updating play services if needed.
     private static final int RC_HANDLE_GMS = 9001;
+    private LatLng latLngClick=null;
+    private Circle circle;
 
     /*Se declara una variable de tipo LocationManager encargada de proporcionar acceso al servicio de localización del sistema.*/
     private LocationManager locationManager;
     /*Se declara una variable de tipo Location que accederá a la última posición conocida proporcionada por el proveedor.*/
     private Location location;
+
+    private fragment_config_geofence frag=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -288,14 +293,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(markerOptions);
     }
 
+
     private void addCircle(LatLng latLng, float radius) {
-        CircleOptions circleOptions = new CircleOptions();
-        circleOptions.center(latLng);
-        circleOptions.radius(radius);
-        circleOptions.strokeColor(Color.argb(255, 255, 0,0));
-        circleOptions.fillColor(Color.argb(64, 255, 0,0));
-        circleOptions.strokeWidth(4);
-        mMap.addCircle(circleOptions);
+
+        this.circle = mMap.addCircle(new CircleOptions()
+                .center(latLng)
+                .strokeColor(Color.argb(255, 255, 0,0))
+                .fillColor(Color.argb(64, 255, 0,0))
+                .radius(100)
+                .strokeWidth(4));
+
     }
         @Override
         public void onMapLongClick(LatLng latLng) {
@@ -304,13 +311,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         private void handleMapLongClick(LatLng latLng) {
+            latLngClick =latLng;
+
             mMap.clear();
             addMarker(latLng);
-            addCircle(latLng, GEOFENCE_RADIUS);
-            addGeofence(latLng, GEOFENCE_RADIUS);
+            addCircle(latLng, GEOFENCE_RADIUS_DEFAULT);
+//            addGeofence(latLng, GEOFENCE_RADIUS);
 
-            fragment_config_geofence frag = new fragment_config_geofence();
+            frag = new fragment_config_geofence(this,GEOFENCE_RADIUS_DEFAULT);
             frag.show(getSupportFragmentManager(), fragment_config_geofence.class.getSimpleName());
+
         }
 
         private void alertNoGps() {
@@ -339,7 +349,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 alert.dismiss ();
             }
         }
+
+    @Override
+    public void addGeofenceGraphic(float geofenceRadius) {
+        addGeofence(latLngClick, geofenceRadius);
+
+        getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(frag.getId())).commit();
+     }
+
+    @Override
+    public void clearGeofenceMaps() {
+        mMap.clear();
+        circle=null;
     }
+
+    @Override
+    public void updateCircleGraphic(float geofenceRadius) {
+        circle.setRadius(geofenceRadius);
+    }
+}
 
 
 

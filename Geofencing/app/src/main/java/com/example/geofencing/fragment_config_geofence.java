@@ -1,41 +1,48 @@
 package com.example.geofencing;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import android.widget.SeekBar;
-import android.widget.Toast;
+
 
 public class fragment_config_geofence extends BottomSheetDialogFragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private SeekBar seekBar;
-    private Button  cmdReinciar;
+    private Button  cmdConfirmar;
     private TextView lblMetros;
+    private InterfaceConfigGeofence caller=null;
+    private float radius;
 
 
     // TODO: Rename and change types of parameters
-    public fragment_config_geofence() {
+    public fragment_config_geofence(Activity activity, float radiusDefault) {
+        this.radius= radiusDefault;
+        this.caller=(InterfaceConfigGeofence) activity;
         // Required empty public constructor
     }
 
-
+    @Override
+    public void onCancel(DialogInterface dialog)
+    {
+        super.onCancel(dialog);
+        handleUserExit();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     public void setupDialog(Dialog dialog, int style) {
@@ -50,10 +57,13 @@ public class fragment_config_geofence extends BottomSheetDialogFragment {
         }
 
         seekBar = (SeekBar) contentView.findViewById(R.id.seekBar);
-        cmdReinciar = (Button) contentView.findViewById(R.id.cmdReiniciar);
+        cmdConfirmar = (Button) contentView.findViewById(R.id.cmdConfirmar);
         lblMetros = (TextView) contentView.findViewById(R.id.lblMetros);
 
         seekBar.setOnSeekBarChangeListener(listenerSeekBar);
+        cmdConfirmar.setOnClickListener(listenerButton);
+
+        seekBar.setProgress((int)radius);
 
 
     }
@@ -80,6 +90,7 @@ public class fragment_config_geofence extends BottomSheetDialogFragment {
                         case BottomSheetBehavior.STATE_HIDDEN:
                             state = "STATE_HIDDEN";
                             //call ALWAYS dismiss to hide the modal background
+                            handleUserExit();
                             dismiss();
                             break;
                     }
@@ -91,27 +102,42 @@ public class fragment_config_geofence extends BottomSheetDialogFragment {
                 public void onSlide(View bottomSheet, float slideOffset) {
                     Log.d(fragment_config_geofence.class.getSimpleName(), String.valueOf(slideOffset));
                 }
-            };
+    };
 
+    private Button.OnClickListener listenerButton = new View.OnClickListener(){
+
+        @Override
+        public void onClick(View view) {
+            caller.addGeofenceGraphic(radius);
+            }
+    };
     private SeekBar.OnSeekBarChangeListener listenerSeekBar = new SeekBar.OnSeekBarChangeListener() {
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+            radius=(float)progress;
+
             lblMetros.setText(String.valueOf(progress));
-            Toast.makeText(getContext(), "seekbar progress: " + progress, Toast.LENGTH_SHORT).show();
+            caller.updateCircleGraphic(radius);
+
         }
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-            Toast.makeText(getContext(), "seekbar touch started!", Toast.LENGTH_SHORT).show();
+
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            Toast.makeText(getContext(), "seekbar touch stopped!", Toast.LENGTH_SHORT).show();
+
         }
 
     };
+
+    private void handleUserExit()
+    {
+        caller.clearGeofenceMaps();
+    }
 
 }
 
