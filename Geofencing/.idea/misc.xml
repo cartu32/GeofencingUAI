@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/User/Desktop/Ejemplo Geofencing/GeofencingUAI/Geofencing/app/src/main/res/layout/fragment_config_geofence.xml" value="0.4" />
+        <entry key="..\:/Users/User/Desktop/Ejemplo Geofencing/GeofencingUAI/Geofencing/app/src/main/res/layout/fragment_config_geofence_obj.xml" value="0.1037037037037037" />
+        <entry key="..\:/Users/User/Desktop/Ejemplo Geofencing/GeofencingUAI/Geofencing/app/src/main/res/layout/fragment_config_geofence_object.xml" value="0.1037037037037037" />
         <entry key="..\:/Users/User/Desktop/Ejemplo Geofencing/truynitaal/Geofencing/app/src/main/res/layout/activity_main.xml" value="0.13020833333333334" />
         <entry key="..\:/Users/User/Desktop/Ejemplo Geofencing/truynitaal/Geofencing/app/src/main/res/layout/activity_maps.xml" value="0.13020833333333334" />
       </map>
