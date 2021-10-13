@@ -158,43 +158,43 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>332</line>
+          <line>329</line>
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>333</line>
+          <line>330</line>
           <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>357</line>
-          <option name="timeStamp" value="38" />
+          <line>105</line>
+          <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>355</line>
-          <option name="timeStamp" value="39" />
+          <line>102</line>
+          <option name="timeStamp" value="47" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>309</line>
-          <option name="timeStamp" value="40" />
+          <line>132</line>
+          <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>317</line>
-          <option name="timeStamp" value="41" />
+          <line>314</line>
+          <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/fragment_config_geofence.java</url>
-          <line>51</line>
-          <option name="timeStamp" value="42" />
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
+          <line>201</line>
+          <option name="timeStamp" value="50" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/fragment_config_geofence.java</url>
-          <line>31</line>
-          <option name="timeStamp" value="43" />
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
+          <line>123</line>
+          <option name="timeStamp" value="51" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

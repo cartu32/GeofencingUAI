@@ -84,19 +84,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap = googleMap;
 
+
         int resultCode= GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             Dialog dlg =GoogleApiAvailability.getInstance().getErrorDialog(this, resultCode, RC_HANDLE_GMS);
             dlg.show();
         }
 
+        mMap.setOnMapLongClickListener(this);
 
         if (Build.VERSION.SDK_INT >= 29) {
             //We need background permission
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
-            } else {
-
             }
         }
         // pedimos permisos para usar la geolocalizacion del dispositivo
@@ -107,31 +107,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.INTERNET}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+                        Manifest.permission.INTERNET}, 10);
             }
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                    return;
         }
+        else {
 
-        mMap.setOnMapLongClickListener(this);
 
-        //TODO preseteamos algunas herramientos que el mapa nos puede proveer
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setAllGesturesEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.getUiSettings().setMapToolbarEnabled(true);
 
-        getLocation();
+            //TODO preseteamos algunas herramientos que el mapa nos puede proveer
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setAllGesturesEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            mMap.getUiSettings().setZoomControlsEnabled(true);
+            mMap.getUiSettings().setMapToolbarEnabled(true);
+
+            getLocation();
+        }
     }
 
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
 
-            case FINE_LOCATION_ACCESS_REQUEST_CODE: {
+            case 10: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //We have the permission
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
