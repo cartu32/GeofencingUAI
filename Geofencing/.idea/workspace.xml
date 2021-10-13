@@ -19,7 +19,10 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[ZY223RV5XQ]" />
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\User\.android\avd\Pixel_4_API_27.avd]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -54,10 +57,21 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
   </component>
+  <component name="ReaderModeSettings">
+    <option name="enabled" value="false" />
+  </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\User\Desktop\Ejemplo Geofencing\GeofencingUAI\Geofencing\app\src\main\res\mipmap-mdpi" />
+    </key>
     <key name="ExtractSuperBase.RECENT_KEYS">
+      <recent name="com.example.geofencing" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.example.geofencing" />
     </key>
     <key name="android.template.1446797302">
@@ -157,43 +171,43 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>329</line>
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
+          <line>331</line>
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>330</line>
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
+          <line>332</line>
           <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>105</line>
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
+          <line>107</line>
           <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>102</line>
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
+          <line>104</line>
           <option name="timeStamp" value="47" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>132</line>
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
+          <line>134</line>
           <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>314</line>
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
+          <line>316</line>
           <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>201</line>
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
+          <line>203</line>
           <option name="timeStamp" value="50" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/MapsActivity.java</url>
-          <line>123</line>
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
+          <line>125</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
       </breakpoints>

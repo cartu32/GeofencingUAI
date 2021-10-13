@@ -1,4 +1,4 @@
-package com.example.geofencing;
+package com.example.geofencing.Fragments;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.example.geofencing.InterfaceConfigGeofence;
+import com.example.geofencing.R;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 

@@ -1,4 +1,4 @@
-package com.example.geofencing;
+package com.example.geofencing.Activities;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -21,6 +21,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.geofencing.Fragments.fragment_config_geofence;
+import com.example.geofencing.GeofenceHelper;
+import com.example.geofencing.InterfaceConfigGeofence;
+import com.example.geofencing.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.Geofence;
@@ -39,7 +43,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, LocationListener,InterfaceConfigGeofence {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, LocationListener, InterfaceConfigGeofence {
 
     private static final String TAG = "MapsActivity";
 
@@ -71,6 +75,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
