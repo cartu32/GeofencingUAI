@@ -1,6 +1,7 @@
-package com.example.geofencing.Activities;
+package com.example.geofencing.Views.Activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
@@ -10,7 +11,6 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,13 +18,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.geofencing.Fragments.fragment_config_geofence;
-import com.example.geofencing.GeofenceHelper;
-import com.example.geofencing.InterfaceConfigGeofence;
+import com.example.geofencing.Interface.InterfaceConfigGeofence;
+import com.example.geofencing.Presenter.GeofenceHelper;
+import com.example.geofencing.Presenter.MapsActivtyPresenter;
 import com.example.geofencing.R;
+import com.example.geofencing.Views.Fragments.fragment_config_geofence;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.Geofence;
@@ -55,10 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String GEOFENCE_ID = "SOME_GEOFENCE_ID";
     private AlertDialog  alert = null;
 
-    private final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
-    private final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
-    public static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 30;
-    public static final long MIN_TIME_BW_UPDATES = 1000 * 45;
+    private MapsActivtyPresenter mapsActivtyPresenter;
     // intent request code to handle updating play services if needed.
     private static final int RC_HANDLE_GMS = 9001;
     private LatLng latLngClick=null;
@@ -81,6 +78,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        mapsActivtyPresenter =new MapsActivtyPresenter(this);
+
         geofencingClient = LocationServices.getGeofencingClient(this);
         geofenceHelper = new GeofenceHelper(this);
     }
@@ -88,7 +87,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
-
 
         int resultCode= GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
@@ -98,141 +96,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.setOnMapLongClickListener(this);
 
-        if (Build.VERSION.SDK_INT >= 29) {
-            //We need background permission
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
-            }
-        }
-        // pedimos permisos para usar la geolocalizacion del dispositivo
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        mapsActivtyPresenter.checkPermisson();
 
-            //A partir de la api 23, se tiene que pedir permisos al dispositivo
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.INTERNET}, 10);
-            }
-        }
-        else {
-
-
-
-            //TODO preseteamos algunas herramientos que el mapa nos puede proveer
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setAllGesturesEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            mMap.getUiSettings().setZoomControlsEnabled(true);
-            mMap.getUiSettings().setMapToolbarEnabled(true);
-
-            getLocation();
-        }
     }
 
+    public void showMessage(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-
-            case 10: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //We have the permission
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                    mMap.setMyLocationEnabled(true);
-                    mMap.getUiSettings().setAllGesturesEnabled(true);
-                    mMap.getUiSettings().setMyLocationButtonEnabled(true);
-                    mMap.getUiSettings().setZoomControlsEnabled(true);
-                    mMap.getUiSettings().setMapToolbarEnabled(false);
-                    //Si se aceptaron los permisos entonces debemos mostrar nuestra ubicacion
-                    //volviendo a pedir a los servicios de ubicacion nuestra posicion
-                    getLocation();
-                }
-            }
-            break;
-
-            case BACKGROUND_LOCATION_ACCESS_REQUEST_CODE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //We have the permission
-                    Toast.makeText(this, "Ahora puedes agregar puntos de Georeferencia", Toast.LENGTH_SHORT).show();
-                } else {
-                    //We do not have the permission..
-                    Toast.makeText(this, "El acceso a la ubicación en segundo plano es necesario para que se activen las geocercas...", Toast.LENGTH_SHORT).show();
-                }
-            }
-            break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + requestCode);
-        }
+        mapsActivtyPresenter.onRequestPermissionsResult(requestCode, permissions,grantResults);
 
     }
 
-    void setPositionGPS() {
-        if (location == null) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
-                    MIN_TIME_BW_UPDATES,
-                    MIN_DISTANCE_CHANGE_FOR_UPDATES, (LocationListener) this);
-            if (locationManager != null) {
-                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                if (location != null) {
-                    positionUpdate(location);
-                }
-            }
-        }
-    }
 
-    void setPositionNetwork(){
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        locationManager.requestLocationUpdates(
-                LocationManager.NETWORK_PROVIDER,
-                MIN_TIME_BW_UPDATES,
-                MIN_DISTANCE_CHANGE_FOR_UPDATES, (LocationListener) this);
-        if (locationManager != null) {
-            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if (location != null) {
-                positionUpdate(location);
-            }
-        }
 
-    }
     public Location getLocation() {
-        try {
-            locationManager = (LocationManager) getApplicationContext()
-                    .getSystemService(getApplicationContext().LOCATION_SERVICE);
-
-            // getting GPS status
-            boolean isGPSEnabled = locationManager
-                    .isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-            // getting network status
-            boolean isNetworkEnabled = locationManager
-                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            if (!isGPSEnabled && !isNetworkEnabled) {
-                // Si no hay proveedor habilitado
-                //solicito que active el gps
-                alertNoGps();
-                }
-
-            // if GPS Enabled get lat/long using GPS Services
-            if (isGPSEnabled) {
-                setPositionGPS();
-            }else if (isNetworkEnabled) {
-                setPositionNetwork();
-            }
-
-        } catch (Exception e) {
-            Log.e("getLocation", e.getMessage());
-        }
-        return location;
+        return mapsActivtyPresenter.getLocation();
     }
+
 
     @Override
     public void onLocationChanged(Location location) {
@@ -254,7 +136,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void positionUpdate(Location location) {
+    public void positionUpdate(Location location) {
 
         if (location != null) {
             //obtengo mi posicion
@@ -265,7 +147,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
         }
     }
+    @SuppressLint("MissingPermission")
+    public void enableMap(){
+        //TODO preseteamos algunas herramientos que el mapa nos puede proveer
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setAllGesturesEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(true);
 
+        getLocation();
+    }
     private void addGeofence(LatLng latLng, float radius) {
 
         Geofence geofence = geofenceHelper.getGeofence(GEOFENCE_ID, latLng, radius, Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT);
@@ -319,21 +211,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.clear();
             addMarker(latLng);
             addCircle(latLng, GEOFENCE_RADIUS_DEFAULT);
-//            addGeofence(latLng, GEOFENCE_RADIUS);
 
             frag = new fragment_config_geofence(this,GEOFENCE_RADIUS_DEFAULT);
             frag.show(getSupportFragmentManager(), fragment_config_geofence.class.getSimpleName());
 
         }
 
-        private void alertNoGps() {
+        public void alertNoGps() {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("El sistema GPS esta desactivado, ¿Desea activarlo?")
                     .setCancelable(false)
                     .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                         public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                             startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                            setPositionGPS();
+                            mapsActivtyPresenter.setPositionGPS();
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {

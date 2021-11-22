@@ -1,4 +1,4 @@
-package com.example.geofencing;
+package com.example.geofencing.Presenter;
 
 import android.app.PendingIntent;
 import android.content.Context;

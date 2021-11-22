@@ -1,4 +1,4 @@
-package com.example.geofencing;
+package com.example.geofencing.Presenter;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.geofencing.Activities.MapsActivity;
+import com.example.geofencing.Views.Activities.MapsActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
@@ -19,8 +19,6 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
-        // an Intent broadcast.
-//        Toast.makeText(context, "Geofence triggered...", Toast.LENGTH_SHORT).show();
 
         NotificationHelper notificationHelper = new NotificationHelper(context);
 
@@ -35,7 +33,6 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         for (Geofence geofence: geofenceList) {
             Log.d(TAG, "onReceive: " + geofence.getRequestId());
         }
-//        Location location = geofencingEvent.getTriggeringLocation();
         int transitionType = geofencingEvent.getGeofenceTransition();
 
         switch (transitionType) {

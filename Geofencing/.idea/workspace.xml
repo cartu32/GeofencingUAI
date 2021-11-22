@@ -22,7 +22,7 @@
   <component name="CodeInsightWorkspaceSettings">
     <option name="optimizeImportsOnTheFly" value="true" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\User\.android\avd\Pixel_4_API_27.avd]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\User\.android\avd\Pixel_3a_API_30.avd]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -33,6 +33,7 @@
       <list>
         <option value="valueResourceFile" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -58,7 +59,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Material-SOA2/Ejemplos/Android/MVP/Sensores-SharedPreferences/MyApplication" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
   </component>
   <component name="ReaderModeSettings">
@@ -171,46 +172,31 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
-          <line>331</line>
-          <option name="timeStamp" value="32" />
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Views/Activities/MapsActivity.java</url>
+          <line>92</line>
+          <option name="timeStamp" value="60" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
-          <line>332</line>
-          <option name="timeStamp" value="33" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Views/Activities/MapsActivity.java</url>
           <line>107</line>
-          <option name="timeStamp" value="46" />
+          <option name="timeStamp" value="62" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
-          <line>104</line>
-          <option name="timeStamp" value="47" />
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Presenter/MapsActivtyPresenter.java</url>
+          <line>90</line>
+          <option name="timeStamp" value="64" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
-          <line>134</line>
-          <option name="timeStamp" value="48" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
-          <line>316</line>
-          <option name="timeStamp" value="49" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
-          <line>203</line>
-          <option name="timeStamp" value="50" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Activities/MapsActivity.java</url>
-          <line>125</line>
-          <option name="timeStamp" value="51" />
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/geofencing/Presenter/MapsActivtyPresenter.java</url>
+          <line>35</line>
+          <option name="timeStamp" value="67" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="app">
+        <watch expression="isNetworkEnabled" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

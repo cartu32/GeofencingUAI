@@ -1,4 +1,4 @@
-package com.example.geofencing;
+package com.example.geofencing.Interface;
 
 public interface InterfaceConfigGeofence {
     void addGeofenceGraphic(float geofenceRadius);
